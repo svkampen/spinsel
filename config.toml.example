@@ -1,0 +1,6 @@
+name           = "segfault dot party"
+layout-dir     = "layout"
+output-dir     = "root"
+posts-dir      = "articles"
+default-layout = "base"
+template-exts  = [".md", ".mustache", ".html"]
