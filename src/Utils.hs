@@ -62,7 +62,7 @@ copyDirMacOS src dest = system [i|cp -Rc #{src} #{dest}|]
 
 -- | Optimized copy on Linux using reflinks
 copyDirLinux :: FilePath -> FilePath -> IO ExitCode
-copyDirLinux src dest = system [i|cp -r --reflink=always #{src} #{dest}|]
+copyDirLinux src dest = system [i|cp -r --reflink=auto #{src} #{dest}|]
 
 -- | Generic copy
 copyDirGeneric :: FilePath -> FilePath -> IO ExitCode
