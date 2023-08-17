@@ -17,6 +17,7 @@ configCodec = Config
     <*> Toml.text "default-layout"                .= configDefaultLayout
     <*> Toml.arrayOf Toml._String "template-exts" .= configTemplateExts
     <*> Toml.text "name"                          .= configName
+    <*> Toml.bool "render-drafts"                 .= configRenderDrafts
 
 loadConfig :: IO (Either Text Config)
 loadConfig = do

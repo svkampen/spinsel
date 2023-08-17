@@ -45,7 +45,8 @@ data Page (a :: PageState) = Page
     published  :: Day,
     layout     :: Layout,
     content    :: ContentType a,
-    targetPath :: Maybe FilePath
+    targetPath :: Maybe FilePath,
+    isDraft    :: Bool
   }
 
 deriving instance Show (ContentType a) => Show (Page a)
@@ -56,7 +57,8 @@ data Config = Config
     configPostsDirectory  :: !FilePath,
     configDefaultLayout   :: !Text,
     configTemplateExts    :: ![String],
-    configName            :: !Text
+    configName            :: !Text,
+    configRenderDrafts    :: !Bool
   }
   deriving (Show)
 

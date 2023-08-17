@@ -64,7 +64,8 @@ constructPage fileName fileStatus contents = do
         published = publishDay,
         layout = layoutText,
         content = body,
-        targetPath = normalise . T.unpack <$> lookup "target" fm
+        targetPath = normalise . T.unpack <$> lookup "target" fm,
+        isDraft = (== Just "true") . lookup "draft" $ fm
       }
 
 generatePossibleFiles :: String -> [FilePath] -> [String] -> [FilePath]
@@ -109,7 +110,12 @@ findPages = do
   exts <- asks configTemplateExts
   excludeDirs <- map ("." </>) <$> sequence [asks configLayoutDirectory, asks configOutputDirectory]
   files <- liftIO $ getMatchingFiles exts excludeDirs "."
-  mapM readPage files
+  pages <- mapM readPage files
+
+  -- Filter out drafts, unless we are in 'render drafts' mode
+  renderDrafts <- asks configRenderDrafts
+  pure $ filter ((||) <$> (not . isDraft) <*> const renderDrafts) pages
+
 
 -- | Filter a list of pages, returning only posts.
 filterPosts :: [Page 'Raw] -> StatelessSpinsel [Page 'Raw]
