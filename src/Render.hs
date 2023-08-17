@@ -22,6 +22,7 @@ import Page                    (Page (..), PageState (Compiled, Raw, Rendered, T
                                 findTemplatesInDirs)
 import System.Directory        (createDirectoryIfMissing)
 import System.FilePath         (normalise, replaceExtension, takeBaseName, takeDirectory, (</>))
+import TemplateFunctions       qualified as TF
 import Text.Megaparsec         qualified as MP
 import Text.MMark              qualified as MMark
 import Text.Mustache           (Template (..), ToMustache (..), object, substitute, (~>))
@@ -119,7 +120,8 @@ generateTemplateData page@Page {title} = do
             "pageTitle" ~> pageTitle,
             "url" ~> url,
             "url_components" ~> url_components,
-            "published" ~> publishDate page
+            "published" ~> publishDate page,
+            "emoji" ~> TF.getEmoji
           ]
       )
       (generatePostsData posts)

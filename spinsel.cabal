@@ -29,6 +29,7 @@ library
       Page
       Parser
       Render
+      TemplateFunctions
       Types
       Utils
   other-modules:
