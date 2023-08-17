@@ -1,6 +1,7 @@
-name           = "segfault dot party"
-layout-dir     = "layout"
-output-dir     = "root"
-posts-dir      = "articles"
+name = "segfault dot party"
+layout-dir = "layout"
+output-dir = "root"
+posts-dir = "articles"
 default-layout = "base"
-template-exts  = [".md", ".mustache", ".html"]
+template-exts = [".md", ".mustache", ".html"]
+render-drafts = true
