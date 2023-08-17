@@ -31,12 +31,11 @@ import Types                   (Config (..), Spinsel, SpinselState (..), Statele
                                 gets)
 import Utils                   (orElse, tshow, unionObjects)
 
---- TODO fix T.pack TL.unpack nonsense
 renderPage :: Page 'Raw -> Either Text (Page 'Rendered)
 renderPage pst = case MMark.parse pst.filename pst.content of
   Left errs -> Left . T.pack $ MP.errorBundlePretty errs
   Right r ->
-    let renderedContent = T.pack . TL.unpack . L.renderText . MMark.render $ r
+    let renderedContent = TL.toStrict . L.renderText . MMark.render $ r
      in Right pst {content = renderedContent}
 
 renderPage' :: Page 'Raw -> Either Text (Page 'Rendered)
