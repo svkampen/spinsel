@@ -1,4 +1,4 @@
-{-# LANGUAGE BlockArguments, ImpredicativeTypes, LambdaCase, OverloadedStrings #-}
+{-# LANGUAGE BlockArguments, ImpredicativeTypes, OverloadedStrings #-}
 module Config (loadConfig) where
 
 import Control.Arrow (left)
