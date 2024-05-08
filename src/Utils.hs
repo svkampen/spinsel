@@ -17,7 +17,16 @@ import System.FilePath         ((</>))
 import System.Info qualified
 import System.Process          (system)
 import Text.Mustache.Types     qualified as M
-import Types                   (StatelessSpinsel)
+import Types                   (Config, Spinsel, SpinselState, StatelessSpinsel, evalStateT,
+                                runStatelessSpinsel)
+
+runS :: Config -> Spinsel r -> SpinselState -> IO (Either T.Text r)
+runS c = (runSS c .) . evalStateT
+
+runSS :: Config -> StatelessSpinsel r -> IO (Either T.Text r)
+runSS config action = do
+  runStatelessSpinsel action config
+
 
 -- | List directory, giving the path including the directory.
 listDirectory' :: FilePath -> IO [FilePath]
@@ -35,6 +44,7 @@ getMatchingFiles exts excludeDirs = go
           dirs' = filter (not . (`elem` excludeDirs)) dirs
       matchingFilesLower <- concat <$> mapM go dirs'
       pure $ matchingFiles ++ matchingFilesLower
+
 
 orElse :: Maybe c -> c -> c
 orElse = flip fromMaybe
@@ -55,6 +65,9 @@ maybeToEither l Nothing  = Left l
 
 maybeToSpinsel :: T.Text -> Maybe b -> StatelessSpinsel b
 maybeToSpinsel = (liftEither .) . maybeToEither
+
+rightToMaybe :: Either a b -> Maybe b
+rightToMaybe = either (const Nothing) Just
 
 -- | Optimized copy on macOS using clonefile
 copyDirMacOS :: FilePath -> FilePath -> IO ExitCode

@@ -18,7 +18,6 @@ dependencies:
 - base >= 4.7 && < 5
 - time >= 1.10
 - megaparsec >= 9.2.0
-- mmark >= 0.0.7.6
 - unix >= 2.7
 - split >= 0.2
 - filepath >= 1.4
@@ -26,13 +25,28 @@ dependencies:
 - lucid >= 2.10
 - mustache >= 2.4
 - mtl >= 2.2
-- tomland >= 1.3.3
 - unordered-containers >= 0.2
 - string-interpolate >= 0.3.2
 - directory >= 1.3
 - cmark >= 0.6
 - process >= 1.6
 - mmorph >= 1.2.0
+- skylighting >= 0.13
+- blaze-markup >= 0.8.2
+- syb >= 0.7.2
+- bytestring >= 0.11.0
+- file-embed >= 0.0.14
+- data-default >= 0.7.1
+- optparse-applicative >= 0.17.1
+- template-haskell >= 2.18
+- vector >= 0.10
+- htoml-megaparsec >= 2.0
+- regex-base >= 0.94
+- regex-tdfa >= 1.3
+- feed >= 1.3
+- xml-types >= 0.3
+- ginger >= 0.10.5
+
 
 ghc-options:
 - -Wall

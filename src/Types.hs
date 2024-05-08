@@ -1,7 +1,10 @@
-{-# LANGUAGE BlockArguments, DataKinds, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, BlockArguments, DataKinds, ExplicitForAll, OverloadedStrings,
+             PatternSynonyms, StandaloneDeriving, TemplateHaskell, TypeFamilies,
+             UndecidableInstances #-}
 
 module Types
   ( Config (..),
+    ConfigOpt (..),
     wrap,
     Spinsel,
     StatelessSpinsel,
@@ -9,7 +12,7 @@ module Types
     runSpinsel,
     runStatelessSpinsel,
     withSpinselState,
-    Page (..),
+    Page (Page, filename, title, published, content, layout, targetPath, isDraft, ..),
     PageState (..),
     ContentType,
     TemplateName,
@@ -21,50 +24,81 @@ where
 import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.State
+import Data.Default
 import Data.Text            (Text)
 import Data.Time            (Day)
-import Text.Mustache        (Template)
-import Text.Mustache.Types  (TemplateCache)
+import Text.Ginger          (SourcePos, Template)
+import THUtils              (mkOptional)
 
 data PageState = Raw | Rendered | Compiled | Templated
 
-type family ContentType (a :: PageState)
-
-type instance ContentType 'Raw = Text
-type instance ContentType 'Rendered = Text
-type instance ContentType 'Compiled = Template
-type instance ContentType 'Templated = Text
+type family ContentType (a :: PageState) where
+  ContentType 'Raw = Text
+  ContentType 'Rendered = Text
+  ContentType 'Compiled = Template SourcePos
+  ContentType 'Templated = Text
 
 type Layout = Text
-
 type TemplateName = Text
 
-data Page (a :: PageState) = Page
-  { filename   :: FilePath,
-    title      :: Text,
-    published  :: Day,
-    layout     :: Layout,
-    content    :: ContentType a,
-    targetPath :: Maybe FilePath,
-    isDraft    :: Bool
-  }
+data Page' c =
+  Page'
+  { _filename   :: FilePath,
+    _title      :: Text,
+    _published  :: Day,
+    _layout     :: Layout,
+    _content    :: c,
+    _targetPath :: Maybe FilePath,
+    _isDraft    :: Bool
+  } deriving (Show, Eq)
 
-deriving instance Show (ContentType a) => Show (Page a)
+newtype Page (s :: PageState) = P (Page' (ContentType s))
+
+deriving instance Show (ContentType s) => Show (Page s)
+deriving instance Eq (ContentType s) => Eq (Page s)
+
+pattern Page :: FilePath -> Text -> Day -> Layout -> ContentType s -> Maybe FilePath -> Bool -> Page s
+pattern Page{filename, title, published, layout, content, targetPath, isDraft} = P (Page' {
+  _filename = filename,
+  _title = title,
+  _published = published,
+  _layout = layout,
+  _content = content,
+  _targetPath = targetPath,
+  _isDraft = isDraft })
 
 data Config = Config
   { configLayoutDirectory :: !FilePath,
     configOutputDirectory :: !FilePath,
     configPostsDirectory  :: !FilePath,
     configDefaultLayout   :: !Text,
-    configTemplateExts    :: ![String],
+    configLayoutExts      :: ![String],
+    configPageExts        :: ![String],
     configName            :: !Text,
+    configSiteUrl         :: !Text,
     configRenderDrafts    :: !Bool
   }
   deriving (Show)
 
+instance Default Config where
+  def :: Config
+  def =
+    Config
+      { configLayoutDirectory = "layouts",
+        configOutputDirectory = "site",
+        configPostsDirectory = "posts",
+        configDefaultLayout = "base",
+        configLayoutExts = [".jinja2"],
+        configPageExts = [".md", ".html"],
+        configName = "My Website",
+        configSiteUrl = "https://example.com/",
+        configRenderDrafts = False
+      }
+
+mapM mkOptional [''Config]
+
 data SpinselState = SpinselState
-  { posts           :: [Page 'Raw],
-    layoutTemplates :: TemplateCache
+  { posts           :: [Page 'Raw]
   }
 
 type SpinselError = Text

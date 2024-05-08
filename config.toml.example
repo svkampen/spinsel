@@ -5,3 +5,4 @@ posts-dir = "articles"
 default-layout = "base"
 template-exts = [".md", ".mustache", ".html"]
 render-drafts = true
+site-url = "https://example.com/"

@@ -1,10 +1,13 @@
-{-# LANGUAGE QuasiQuotes #-}
-module TemplateFunctions (getEmoji) where
+{-# LANGUAGE BlockArguments, OverloadedStrings, QuasiQuotes #-}
 
-import Data.String.Interpolate (i)
-import Data.Text               (Text)
-import Text.Mustache.Types     (Node (..), STree, SubM)
+module TemplateFunctions (gfnEmoji) where
 
-getEmoji :: STree -> SubM Text
-getEmoji (TextBlock text:_) = pure [i|<img class='emoji' src='/static/emoji/#{text}.png' />|]
-getEmoji _                  = error "input is not a textblock"
+import Data.String.Interpolate   (i)
+import Text.Ginger.GVal          (Function, GVal (..), toGVal)
+import Text.Ginger.Html          (unsafeRawHtml)
+import Text.Ginger.Run           (Run)
+import Text.Ginger.Run.FuncUtils (unaryFunc)
+
+
+gfnEmoji :: forall p m h. Monad m => Function (Run p m h)
+gfnEmoji = unaryFunc (toGVal . unsafeRawHtml . (\v -> [i|<img class='emoji' src='/static/emoji/#{v}.png' />|]) . asText)

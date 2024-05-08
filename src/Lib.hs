@@ -1,20 +1,17 @@
-{-# LANGUAGE BlockArguments, QuasiQuotes #-}
-module Lib (runS, runSS, copyAssets) where
+{-# LANGUAGE BlockArguments, DataKinds, QuasiQuotes #-}
 
-import Config                  (loadConfig)
+module Lib (generatePage, copyAssets) where
+
 import Data.String.Interpolate (i)
-import Data.Text               (Text)
-import Types                   (Config (..), Spinsel, SpinselState (..), StatelessSpinsel, asks,
-                                evalStateT, liftIO, runStatelessSpinsel)
+import Data.Text.IO            qualified as TIO
+import Page                    (generateUrl)
+import Render                  (renderPage)
+import System.Directory        (createDirectoryIfMissing)
+import System.FilePath         (takeDirectory, (</>))
+import Template                (templatePage)
+import Types                   (Config (..), Page (..), PageState (..), Spinsel, StatelessSpinsel,
+                                asks, lift, liftIO)
 import Utils                   (copyDir)
-
-runS :: Spinsel r -> SpinselState -> IO (Either Text r)
-runS = (runSS .) . evalStateT
-
-runSS :: StatelessSpinsel r -> IO (Either Text r)
-runSS action = do
-  Right c <- loadConfig
-  runStatelessSpinsel action c
 
 copyAssets :: StatelessSpinsel ()
 copyAssets = do
@@ -24,3 +21,18 @@ copyAssets = do
     putStrLn "Copying assets..."
     copyDir "./static" [i|./#{outputDir}/|]
     putStrLn [i|Updated #{outputDir}/|]
+
+generatePage :: Page 'Raw -> Spinsel (Page 'Templated)
+generatePage page = do
+  liftIO $ putStrLn [i|Generating page #{filename page}|]
+  outputDir <- asks configOutputDirectory
+  liftIO $ putStrLn "Rendering..."
+  renderedPage <- lift $ renderPage page
+  liftIO $ putStrLn "Templating..."
+  page' <- templatePage renderedPage
+
+  let outputPath = outputDir </> ("." ++ generateUrl page)
+  liftIO $ do
+    createDirectoryIfMissing True (takeDirectory outputPath)
+    TIO.writeFile outputPath (content page')
+  pure page'
