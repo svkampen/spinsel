@@ -27,6 +27,6 @@ main = do
     withSpinselState state do
       completePosts <- mapM generatePage rawPosts
       mapM_ generatePage (rawPages \\ rawPosts)
-      -- generateFeed completePosts -- temporarily disabled due to content issues
+      generateFeed completePosts -- temporarily disabled due to content issues
 
     copyAssets

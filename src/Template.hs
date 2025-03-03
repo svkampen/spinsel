@@ -39,6 +39,8 @@ generateTemplateData page = do
   name <- asks configName
   posts <- gets posts
 
+  siteUrl <- asks configSiteUrl
+
   let pageTitle = [i|#{title page} – #{name}|] :: String
       url = generateUrl page
       url_parts = splitOn "/" url
@@ -52,6 +54,7 @@ generateTemplateData page = do
   let ps = [ "title" ~> title page,
              "pageTitle" ~> pageTitle,
              "url" ~> url,
+             "full_url" ~> T.append siteUrl (T.pack url),
              "url_components" ~> url_components,
              "published" ~> publishDate page,
              "emoji" ~> Ginger.fromFunction (gfnEmoji @p @m @h)

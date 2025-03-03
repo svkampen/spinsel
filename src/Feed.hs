@@ -18,7 +18,12 @@ import Types
 
 -- todo this isn't quite right as it doesn't include a time.
 dayToISO :: Time.Day -> Text
-dayToISO = T.pack . formatTime defaultTimeLocale "%F"
+dayToISO = T.pack . formatTime defaultTimeLocale "%FT12:00:00Z"
+
+me :: Atom.Person
+me = Atom.nullPerson {
+  Atom.personName = "Sam van Kampen"
+}
 
 -- Convert a templated page to an Atom entry.
 toEntry :: Page 'Templated -> StatelessSpinsel Atom.Entry
@@ -32,6 +37,7 @@ toEntry page = do
         { Atom.entryLinks = [Atom.nullLink url]
         , Atom.entryContent = Just (Atom.HTMLContent . content $ page)
         , Atom.entryAttrs = [("xml:base", [ContentText siteUrl])]
+        , Atom.entryAuthors = [me]
         }
 
 feed :: Spinsel Atom.Feed
@@ -40,7 +46,7 @@ feed = do
     siteName <- asks configName
     curPosts <- gets posts
     pure $ Atom.nullFeed
-      (T.append siteUrl "atom.xml") -- ID
+      (T.append siteUrl "/atom.xml") -- ID
       (Atom.TextString siteName) -- Title
       (case curPosts of-- Updated
         p:_ -> dayToISO . published $ p
@@ -51,7 +57,8 @@ generateFeed posts = do
     siteUrl <- asks configSiteUrl
     atomFeed <- feed
     entries <- lift $ mapM toEntry posts
-    let atomFeed' = atomFeed { Atom.feedEntries = entries, Atom.feedLinks = [Atom.nullLink siteUrl] }
+    let atomFeedLink = (Atom.nullLink (T.append siteUrl "/atom.xml")) { Atom.linkRel = Just (Left "self") }
+        atomFeed' = atomFeed { Atom.feedEntries = entries, Atom.feedLinks = [Atom.nullLink siteUrl, atomFeedLink] }
         atomText = maybe "" TL.toStrict (Atom.Export.textFeed atomFeed')
 
     outputDir <- asks configOutputDirectory

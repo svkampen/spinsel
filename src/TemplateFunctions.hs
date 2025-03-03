@@ -10,4 +10,4 @@ import Text.Ginger.Run.FuncUtils (unaryFunc)
 
 
 gfnEmoji :: forall p m h. Monad m => Function (Run p m h)
-gfnEmoji = unaryFunc (toGVal . unsafeRawHtml . (\v -> [i|<img class='emoji' src='/static/emoji/#{v}.png' />|]) . asText)
+gfnEmoji = unaryFunc (toGVal . unsafeRawHtml . (\v -> [i|<img class='emoji' style='max-height: 1em;' src='/static/emoji/#{v}.png' />|]) . asText)
