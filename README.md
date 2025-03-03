@@ -1,5 +1,5 @@
 # Spinsel
-Spinsel is a custom static site generator written for my website, [segfault.party](https://segfault.party/). It transforms pages written in Markdown with Mustache templating to HTML. It is written just for fun (and as an exercise to get better at Haskell) - if you're looking for a static site generator, use something like Hugo or Jekyll instead.
+Spinsel is a custom static site generator written for my website, [segfault.party](https://segfault.party/). It transforms pages written in Markdown with Jinja2 templating to HTML. It is written just for fun, and as an exercise to get better at Haskell.
 
 # Building
 Spinsel uses `stack`, so building is as easy as running `stack build`.
