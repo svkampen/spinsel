@@ -25,7 +25,7 @@ generatePostsData posts = do
   where
     genPostData :: Page 'Raw -> Spinsel (GVal m)
     genPostData page = do
-      pure $ dict ["title" ~> title page, "url" ~> generateUrl page, "published" ~> publishDate page]
+      pure $ dict ["title" ~> title page, "url" ~> generateUrl page, "published" ~> publishDate page, "isDraft" ~> isDraft page]
 
 genIntermediatePaths :: [String] -> [String]
 genIntermediatePaths path_elems = genPathOfLengthAtMost <$> [1 .. length path_elems]

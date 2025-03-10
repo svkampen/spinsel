@@ -8,7 +8,7 @@ import Data.Text    qualified as T
 import Data.Text.IO qualified as TIO
 import Feed         (generateFeed)
 import Lib          (copyAssets, generatePage)
-import Page         (filterPosts, findPages)
+import Page         (filterPosts, findPages, isDraft)
 import Types        (SpinselState (..), withSpinselState)
 import Utils        (runSS)
 
@@ -27,6 +27,8 @@ main = do
     withSpinselState state do
       completePosts <- mapM generatePage rawPosts
       mapM_ generatePage (rawPages \\ rawPosts)
-      generateFeed completePosts -- temporarily disabled due to content issues
+
+      let feedPosts = filter (not . isDraft) completePosts
+      generateFeed feedPosts-- temporarily disabled due to content issues
 
     copyAssets
